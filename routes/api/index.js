@@ -7,5 +7,8 @@ router.use('/users', users);
 router.use('/profiles', profiles);
 router.use('/interviews', interviews);
 
+router.use((req, res) => {
+    res.sendFile(path.join(__dirname + "../../public/index.html"))
+})
 
 module.exports = router;
