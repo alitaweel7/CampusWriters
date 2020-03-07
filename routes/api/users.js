@@ -1,21 +1,29 @@
 const mongoose = require('mongoose');
 const router = require('express').Router();
-const User = mongoose.model('User');
-const auth = require('../auth');
+const User = require("../../models").Users;
 
-router.post('/users', (req, res, ) => {
-  user.username = req.body.user.username;
-  user.email = req.body.user.email;
-  user.setPassword(req.body.user.password);
-
-  user.save().then((dbUser) => {
+// All routes from here begin with /api/users/*name
+router.post('/new', (req, res) => {
+  const user = {
+    username: req.body.username,
+    email: req.body.email
+  }
+  User.create(user).then((dbUser) => {
     return res.json({ dbUser });
-  }).catch(next);
+  }).catch(err => {
+    res.json(err)
+  })
 });
 
-router.post('/users/login', (req, res) => {
+router.post('/login', (req, res) => {
   res.json({ success: true })
 });
+
+router.route("/all").get((req, res) => {
+  User.find().then(users => {
+    res.json({ data: users })
+  })
+})
 
 router.get('/user', (req, res) => {
   User.findById(req.body.id).then((user) => {
@@ -24,7 +32,7 @@ router.get('/user', (req, res) => {
   })
 });
 
-router.put('/user', auth.required, function (req, res, next) {
+router.put('/user', (req, res) => {
   User.findById(req.payload.id).then(function (user) {
     if (!user) { return res.sendStatus(401); }
 
