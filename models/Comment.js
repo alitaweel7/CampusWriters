@@ -1,13 +1,13 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 mongoose.plugin(schema => { schema.options.usePushEach = true });
 
-var CommentSchema = new mongoose.Schema({
+const CommentSchema = new mongoose.Schema({
   body: String,
-  author: {type: mongoose.Schema.Types.ObjectId, ref:'User'},
-  interview: {type: mongoose.Schema.Types.ObjectId, ref:'Interview'}
-}, {timestamps: true});
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  interview: { type: mongoose.Schema.Types.ObjectId, ref: 'Interview' }
+}, { timestamps: true });
 
-CommentSchema.methods.toJSONFor = function(user) {
+CommentSchema.methods.toJSONFor = function (user) {
   return {
     id: this._id,
     body: this.body,
@@ -16,5 +16,5 @@ CommentSchema.methods.toJSONFor = function(user) {
   };
 };
 
-var Comment = mongoose.model('Comment', CommentSchema);
+const Comment = mongoose.model('Comment', CommentSchema);
 module.exports = Comment;

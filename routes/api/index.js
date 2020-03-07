@@ -1,4 +1,4 @@
-var router = require('express').Router();
+const router = require('express').Router();
 const users = require("./users");
 const profiles = require("./profiles");
 const interviews = require("./interviews");

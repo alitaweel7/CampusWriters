@@ -1,20 +1,20 @@
-var router = require('express').Router();
-var passport = require('passport');
-var mongoose = require('mongoose');
-mongoose.plugin(schema => { schema.options.usePushEach = true });
-var Interview = mongoose.model('Interview');
-var User = mongoose.model('User');
-var Comment = mongoose.model('Comment');
-var auth = require('../auth');
+const mongoose = require('mongoose');
+const router = require('express').Router();
+const Interview = require("../../models").Interview
 
-router.post('/', auth.required, function (req, res, next) {
+//mongoose.plugin(schema => { schema.options.usePushEach = true });
+//let Interview = mongoose.model('Interview');
+const User = mongoose.model('User');
+const Comment = mongoose.model('Comment');
+const auth = require('../auth');
+
+//All Routes from here begin with /api/interviews/*name
+router.post('/new', (req, res) => {
   User.findById(req.payload.id).then(function (user) {
-    if (!user) { return res.sendStatus(401); }
 
-    var interview = new Interview(req.body.interview);
+    const interview = new Interview(req.body.interview);
 
     interview.author = user;
-    //if(interview.author.username != 'alimustafa') { return res.sendStatus(401); }
 
     return interview.save().then(function () {
       //console.log(interview.author);
@@ -23,41 +23,40 @@ router.post('/', auth.required, function (req, res, next) {
   }).catch(next);
 });
 
-router.get('/:interview', auth.optional, function (req, res, next) {
+router.get('/interview', (req, res) => {
   Promise.all([
     req.payload ? User.findById(req.payload.id) : null,
     req.interview.populate('author').execPopulate()
   ]).then(function (results) {
-    var user = results[0];
+    const user = results[0];
     return res.json({ interview: req.interview.toJSONFor(user) });
   }).catch(next);
 });
 
-router.put('/:interview', auth.required, function (req, res, next) {
+router.put('/interview', (req, res) => {
   User.findById(req.payload.id).then(function (user) {
     if (req.interview.author._id.toString() === req.payload.id.toString()) {
+
       if (typeof req.body.interview.title !== 'undefined') {
-        req.interview.title = req.body.interview.title;
+        interview.title = req.body.interview.title; //req. from the start
       }
 
       if (typeof req.body.interview.description !== 'undefined') {
-        req.interview.description = req.body.interview.description;
+        interview.description = req.body.interview.description; //req. from the start
       }
 
       if (typeof req.body.interview.body !== 'undefined') {
-        req.interview.body = req.body.interview.body;
+        interview.body = req.body.interview.body; //req. from the start
       }
 
-      req.interview.save().then(function (interview) {
+      return interview.save().then(function (interview) {
         return res.json({ interview: interview.toJSONFor(user) });
       }).catch(next);
-    } else {
-      return res.sendStatus(403);
     }
   });
 });
 
-router.delete('/:interview', auth.required, function (req, res, next) {
+router.delete('/interview', (req, res) => {
   User.findById(req.payload.id).then(function () {
     if (req.interview.author._id.toString() === req.payload.id.toString()) {
       return req.interview.remove().then(function () {
@@ -69,8 +68,8 @@ router.delete('/:interview', auth.required, function (req, res, next) {
   });
 });
 
-router.post('/:interview/favorite', auth.required, function (req, res, next) {
-  var interviewId = req.interview._id;
+router.post('/interview/favorite', (req, res) => {
+  const interviewId = req.interview._id;
 
   User.findById(req.payload.id).then(function (user) {
     if (!user) { return res.sendStatus(401); }
@@ -83,8 +82,8 @@ router.post('/:interview/favorite', auth.required, function (req, res, next) {
   }).catch(next);
 });
 
-router.delete('/:interview/favorite', auth.required, function (req, res, next) {
-  var interviewId = req.interview._id;
+router.delete('/interview/favorite', (req, res) => {
+  const interviewId = req.interview._id;
 
   User.findById(req.payload.id).then(function (user) {
     if (!user) { return res.sendStatus(401); }
@@ -97,11 +96,11 @@ router.delete('/:interview/favorite', auth.required, function (req, res, next) {
   }).catch(next);
 });
 
-router.post('/:interview/comments', auth.required, function (req, res, next) {
+router.post('/interview/comments', (req, res) => {
   User.findById(req.payload.id).then(function (user) {
     if (!user) { return res.sendStatus(401); }
 
-    var comment = new Comment(req.body.comment);
+    const comment = new Comment(req.body.comment);
     comment.interview = req.interview;
     comment.author = user;
 
@@ -115,7 +114,7 @@ router.post('/:interview/comments', auth.required, function (req, res, next) {
   }).catch(next);
 });
 
-router.get('/:interview/comments', auth.optional, function (req, res, next) {
+router.get('/interview/comments', (req, res) => {
   Promise.resolve(req.playload ? User.findById(req.payload.id) : null).then(function (user) {
     return req.interview.populate({
       path: 'comments',
@@ -137,7 +136,7 @@ router.get('/:interview/comments', auth.optional, function (req, res, next) {
   }).catch(next);
 });
 
-router.param('comment', function (req, res, next, id) {
+router.param('comment', (req, res, id) => {
   Comment.findById(id).then(function (comment) {
     if (!comment) { return res.sendStatus(401); }
 
@@ -147,7 +146,7 @@ router.param('comment', function (req, res, next, id) {
   }).catch(next);
 });
 
-router.delete('/:interview/comments/:comment', auth.required, function (req, res, next) {
+router.delete('/:interview/comments/:comment', (req, res) => {
   if (req.comment.author.toString() === req.payload.id.toString()) {
     req.interview.comments.remove(req.comment._id);
     req.interview.save().then(Comment.find({ _id: req.comment._id }).remove().exec())
@@ -159,10 +158,10 @@ router.delete('/:interview/comments/:comment', auth.required, function (req, res
   }
 });
 
-router.get('/', auth.optional, function (req, res, next) {
-  var query = {};
-  var limit = 20;
-  var offset = 0;
+router.get('/', (req, res) => {
+  const query = {};
+  const limit = 20;
+  const offset = 0;
 
   if (typeof req.query.limit !== 'undefined') {
     limit = req.query.limit;
@@ -180,8 +179,8 @@ router.get('/', auth.optional, function (req, res, next) {
     req.query.author ? User.findOne({ username: req.query.author }) : null,
     req.query.favorited ? User.findOne({ username: req.query.favorited }) : null
   ]).then(function (results) {
-    var author = results[0];
-    var favoriter = results[1];
+    const author = results[0];
+    const favoriter = results[1];
 
     if (author) {
       query.author = author._id;
@@ -203,9 +202,9 @@ router.get('/', auth.optional, function (req, res, next) {
       Interview.count(query).exec(),
       req.payload ? User.findById(req.payload.id) : null,
     ]).then(function (results) {
-      var interviews = results[0];
-      var interviewsCount = results[1];
-      var user = results[2];
+      const interviews = results[0];
+      const interviewsCount = results[1];
+      const user = results[2];
 
       return res.json({
         interviews: interviews.map(function (interview) {
@@ -217,7 +216,7 @@ router.get('/', auth.optional, function (req, res, next) {
   }).catch(next);
 });
 
-router.param('interview', function (req, res, next, slug) {
+router.param('interview', (req, res, slug) => {
   Interview.findOne({ slug: slug })
     .populate('author')
     .then(function (interview) {

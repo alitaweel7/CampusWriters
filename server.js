@@ -1,12 +1,8 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const session = require('express-session')
 const cors = require('cors')
-const passport = require('passport')
-const errorhandler = require('errorhandler')
 const mongoose = require('mongoose');
 const router = require('./routes')
-
 var isProduction = process.env.NODE_ENV === 'production';
 
 // Create global app object
@@ -44,8 +40,8 @@ if (!isProduction) {
     });
   });
 }
-
+const port = process.env.PORT ? process.env.PORT : 3001
 // finally, let's start our server...
-app.listen(process.env.PORT || 3000, function () {
-  console.log('Listening on port ' + server.address().port);
+app.listen(port, function () {
+  console.log(`Listening on port ${port}`);
 });
