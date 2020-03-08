@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 const router = require('express').Router();
-const User = require("../../models").Users;
+const Interview = require("../../models").Interview;
 
-// All routes from here begin with /api/users/*name
+// All routes from here begin with /api/users
 router.post('/new', (req, res) => {
-  const user = {
+  const Interview = {
     username: req.body.username,
     email: req.body.email
   }
-  User.create(user).then((dbUser) => {
+  Interview.create(user).then((dbUser) => {
     return res.json({ dbUser });
   }).catch(err => {
     res.json(err)
@@ -20,20 +20,26 @@ router.post('/login', (req, res) => {
 });
 
 router.route("/all").get((req, res) => {
-  User.find().then(users => {
+  Interview.find().then(users => {
     res.json({ data: users })
   })
 })
 
 router.get('/user', (req, res) => {
-  User.findById(req.body.id).then((user) => {
+  Interview.findById(req.body.id).then((user) => {
     if (!user) { return res.sendStatus(401); }
     return res.json({ user: user.toAuthJSON() });
   })
 });
 
+router.delete("/delete", (req, res) => {
+  Interview.findByIdAndDelete(res.body.id).then(response => {
+    res.json(response)
+  })
+});
+
 router.put('/user', (req, res) => {
-  User.findById(req.payload.id).then(function (user) {
+  Interview.findById(req.body.id).then(function (user) {
     if (!user) { return res.sendStatus(401); }
 
     // only update fields that were actually passed...

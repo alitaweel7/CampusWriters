@@ -3,10 +3,10 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const mongoose = require('mongoose');
 const router = require('./routes')
-var isProduction = process.env.NODE_ENV === 'production';
+const isProduction = process.env.NODE_ENV === 'production';
 
 // Create global app object
-var app = express();
+const app = express();
 app.use(cors());
 
 // Normal express config defaults

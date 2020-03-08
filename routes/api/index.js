@@ -1,11 +1,10 @@
 const router = require('express').Router();
 const users = require("./users");
-const profiles = require("./profiles");
 const interviews = require("./interviews");
 const path = require("path")
 
+//All routes from here begin with /api
 router.use('/users', users);
-router.use('/profiles', profiles);
 router.use('/interviews', interviews);
 
 router.use((req, res) => {
