@@ -61,17 +61,6 @@ router.delete("/delete", (req, res) => {
   })
 });
 
-//router.delete('/interview', (req, res) => {
-//User.findById(req.payload.id).then(function () {
-//if (req.interview.author._id.toString() === req.payload.id.toString()) {
-//return req.interview.remove().then(function () {
-//return res.sendStatus(204);
-//});
-//} else {
-//return res.sendStatus(403);
-//}
-//});
-//});
 
 router.post('/interview/favorite', (req, res) => {
   const interviewId = req.interview._id;
@@ -131,16 +120,6 @@ router.get('/interview/comments', (req, res) => {
   });
 });
 
-// router.param('comment', (req, res, id) => {
-//   Comment.findById(id).then(function (compament) {
-//     if (!comment) { return res.sendStatus(401); }
-
-//     req.comment = comment;
-
-//     return next();
-//   }).catch(next);
-// });
-
 router.delete('/interview/comments/comment', (req, res) => {
   if (req.comment.author.toString() === req.payload.id.toString()) {
     req.interview.comments.remove(req.comment._id);
@@ -152,76 +131,5 @@ router.delete('/interview/comments/comment', (req, res) => {
     res.sendStatus(403);
   }
 });
-
-// router.get('/', (req, res) => {
-//   const query = {};
-//   const limit = 20;
-//   const offset = 0;
-
-//   if (typeof req.query.limit !== 'undefined') {
-//     limit = req.query.limit;
-//   }
-
-//   if (typeof req.query.offset !== 'undefined') {
-//     offset = req.query.offset;
-//   }
-
-//   if (typeof req.query.tag !== 'undefined') {
-//     query.tagList = { "$in": [req.query.tag] };
-//   }
-
-//   Promise.all([
-//     req.query.author ? User.findOne({ username: req.query.author }) : null,
-//     req.query.favorited ? User.findOne({ username: req.query.favorited }) : null
-//   ]).then(function (results) {
-//     const author = results[0];
-//     const favoriter = results[1];
-
-//     if (author) {
-//       query.author = author._id;
-//     }
-
-//     if (favoriter) {
-//       query._id = { $in: favoriter.favorites };
-//     } else if (req.query.favorited) {
-//       query._id = { $in: [] };
-//     }
-
-//     return Promise.all([
-//       Interview.find(query)
-//         .limit(Number(limit))
-//         .skip(Number(offset))
-//         .sort({ createdAt: 'desc' })
-//         .populate('author')
-//         .exec(),
-//       Interview.count(query).exec(),
-//       req.payload ? User.findById(req.payload.id) : null,
-//     ]).then(function (results) {
-//       const interviews = results[0];
-//       const interviewsCount = results[1];
-//       const user = results[2];
-
-//       return res.json({
-//         interviews: interviews.map(function (interview) {
-//           return interview.toJSONFor(user);
-//         }),
-//         interviewsCount: interviewsCount
-//       });
-//     });
-//   }).catch(next);
-// });
-
-// router.param('interview', (req, res, slug) => {
-//   Interview.findOne({ slug: slug })
-//     .populate('author')
-//     .then(function (interview) {
-//       if (!interview) { return res.sendStatus(404); }
-
-//       req.interview = interview;
-//       interview.comments = interview.comments || [];
-
-//       return next();
-//     }).catch(next);
-// });
 
 module.exports = router;
