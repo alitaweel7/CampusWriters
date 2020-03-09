@@ -2,13 +2,13 @@ const mongoose = require('mongoose');
 const router = require('express').Router();
 const Interview = require("../../models/Interview");
 
+//All Routes from here begin with /api/interviews/ON_THIS_PAGE
 
 //this function takes object with
 // {
 //   authorId: 12,
 //   slug: "the first interview."
 // }
-//All Routes from here begin with /api/interviews/ON_THIS_PAGE
 router.post('/new', (req, res) => {
   const interview = new Interview();
 
@@ -31,21 +31,21 @@ router.get('/interview', (req, res) => {
   });
 });
 
-//---------- or ('interview') after put?
+
 router.put('/interview', (req, res) => {
   Interview.findById(req.body.id).then(function (interview) {
     if (!interview) { return res.sendStatus(401); }
 
     if (typeof req.body.interview.title !== 'undefined') {
-      interview.title = req.body.interview.title; //req. from the start
+      interview.title = req.body.interview.title;
     }
 
     if (typeof req.body.interview.description !== 'undefined') {
-      interview.description = req.body.interview.description; //req. from the start
+      interview.description = req.body.interview.description;
     }
 
     if (typeof req.body.interview.body !== 'undefined') {
-      interview.body = req.body.interview.body; //req. from the start
+      interview.body = req.body.interview.body;
     }
 
     return interview.save().then(function (interview) {
@@ -114,7 +114,7 @@ router.post('/interview/comments', (req, res) => {
 });
 
 router.get('/interview/comments', (req, res) => {
-  Interview.findBySlug(req.payload.slug).then((interview) => {   //depeding on whether we are finding the interview by MongoDBs ID, or the slug that we create
+  Interview.findBySlug(req.payload.slug).then((interview) => {   //depeding on whether we are finding the interview by MongoDBs ID, or the slug that we create (use slug or ID)
     if (!interview) { return res.sendStatus(401); }
     return res.json({ comments: interview.comments.toJSONFor(interview) });
   });
