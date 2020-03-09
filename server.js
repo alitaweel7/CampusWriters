@@ -20,7 +20,7 @@ app.use(express.static(__dirname + '/public'));
 if (isProduction) {
   mongoose.connect(process.env.MONGODB_URI);
 } else {
-  mongoose.connect('mongodb://localhost/conduit');
+  mongoose.connect('mongodb://localhost/conduit');// I removed conduit ask Justin!!!!!!!!!!!
   mongoose.set('debug', true);
 }
 

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const router = require('express').Router();
-const Interview = require("../../models").Interview
+const Interview = require("../../models/Interview");
 
 
 //this function takes object with

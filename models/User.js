@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
 mongoose.plugin(schema => { schema.options.usePushEach = true });
 const uniqueValidator = require('mongoose-unique-validator');
-const crypto = require('crypto');
-const jwt = require('jsonwebtoken');
-const secret = require('../config').secret;
+const jwt = require('jsonwebtoken'); //not doing auth anymore
+const secret = require('../config').secret; ///// don't need this right?
 
 const UserSchema = new mongoose.Schema({
   username: { type: String, lowercase: true, unique: true, required: [true, "can't be blank"], match: [/^[a-zA-Z0-9]+$/, 'is invalid'], index: true },

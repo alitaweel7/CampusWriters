@@ -1,14 +1,18 @@
 const mongoose = require('mongoose');
 const router = require('express').Router();
-const Interview = require("../../models").Interview;
+const User = require("../../models/User");
+//var User = mongoose.model('User');
 
-// All routes from here begin with /api/users
+
+
+// All routes from here begin with /api/users/*name
 router.post('/new', (req, res) => {
-  const Interview = {
+
+  const user = {
     username: req.body.username,
     email: req.body.email
   }
-  Interview.create(user).then((dbUser) => {
+  User.create(user).then((dbUser) => { // CREATE PROPERTY IS UNDEFINED.....
     return res.json({ dbUser });
   }).catch(err => {
     res.json(err)
@@ -20,13 +24,15 @@ router.post('/login', (req, res) => {
 });
 
 router.route("/all").get((req, res) => {
-  Interview.find().then(users => {
+  User.find().then(users => {
     res.json({ data: users })
   })
 })
 
+
+// Since there is no Auth, no Token coming bacvk----------------------
 router.get('/user', (req, res) => {
-  Interview.findById(req.body.id).then((user) => {
+  User.findById(req.body.id).then((user) => {
     if (!user) { return res.sendStatus(401); }
     return res.json({ user: user.toAuthJSON() });
   })
@@ -39,7 +45,7 @@ router.delete("/delete", (req, res) => {
 });
 
 router.put('/user', (req, res) => {
-  Interview.findById(req.body.id).then(function (user) {
+  User.findById(req.body.id).then(function (user) {
     if (!user) { return res.sendStatus(401); }
 
     // only update fields that were actually passed...
