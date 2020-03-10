@@ -1,9 +1,6 @@
 const mongoose = require('mongoose');
 const router = require('express').Router();
 const User = require("../../models/User");
-//var User = mongoose.model('User');
-
-
 
 // All routes from here begin with /api/users/*name
 router.post('/new', (req, res) => {
@@ -12,7 +9,7 @@ router.post('/new', (req, res) => {
     username: req.body.username,
     email: req.body.email
   }
-  User.create(user).then((dbUser) => { // CREATE PROPERTY IS UNDEFINED.....
+  User.create(user).then((dbUser) => {
     return res.json({ dbUser });
   }).catch(err => {
     res.json(err)
@@ -30,7 +27,7 @@ router.route("/all").get((req, res) => {
 })
 
 
-// Since there is no Auth, no Token coming bacvk----------------------
+// Since there is no Auth, no Token coming back----------------------
 router.get('/user', (req, res) => {
   User.findById(req.body.id).then((user) => {
     if (!user) { return res.sendStatus(401); }
@@ -39,7 +36,7 @@ router.get('/user', (req, res) => {
 });
 
 router.delete("/delete", (req, res) => {
-  Interview.findByIdAndDelete(res.body.id).then(response => {
+  User.findByIdAndDelete(res.body.id).then(response => { // deleting the user, can't find byID
     res.json(response)
   })
 });
@@ -64,11 +61,13 @@ router.put('/user', (req, res) => {
     if (typeof req.body.user.password !== 'undefined') {
       user.setPassword(req.body.user.password);
     }
-
     return user.save().then(function () {
       return res.json({ user: user.toAuthJSON() });
     });
-  }).catch(next);
+  }).catch(err => {
+    res.json(err)
+    console.log(err)
+  });
 });
 
 module.exports = router;

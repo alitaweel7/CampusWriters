@@ -10,22 +10,20 @@ const Interview = require("../../models/Interview");
 //   slug: "the first interview."
 // }
 router.post('/new', (req, res) => {
-  const interview = new Interview();
-
-  User.findById(req.payload.autherId).then(function (user) {
+  User.findById(req.body.autherId).then(function (user) {
     interview.author = user;
-    // interview.title = req.payload.title; //optional
-    interview.slug = req.payload.slug; //optional
+    // interview.title = req.body.title; //optional
+    interview.slug = req.body.slug; //optional
 
-    return interview.save().then(function () {
+    Interview.create({ author: user, slug: req.body.slug, ...req.body }).then(function () {
       console.log(interview);
       return res.json({ interview: interview.toJSONFor(user) })
     });
-  }).catch(next);
+  }).catch(err => res.json(err));
 });
 
 router.get('/interview', (req, res) => {
-  Interview.findBySlug(req.payload.slug).then((interview) => {   //depeding on whether we are finding the interview by MongoDBs ID, or the slug that we create
+  Interview.findBySlug(req.body.slug).then((interview) => {   //depeding on whether we are finding the interview by MongoDBs ID, or the slug that we create
     if (!interview) { return res.sendStatus(401); }
     return res.json({ interview: interview.toJSONFor(interview) });
   });
@@ -62,10 +60,10 @@ router.delete("/delete", (req, res) => {
 });
 
 
-router.post('/interview/favorite', (req, res) => {
+router.post('/interview/favorite', (req, res, next) => {
   const interviewId = req.interview._id;
 
-  Interview.findById(req.payload.id).then(function (interview) {
+  Interview.findById(req.body.id).then(function (interview) {
     if (!interview) { return res.sendStatus(401); }
 
     return user.favorite(interviewId).then(function () {
@@ -76,10 +74,10 @@ router.post('/interview/favorite', (req, res) => {
   }).catch(next);
 });
 
-router.delete('/interview/favorite', (req, res) => {
+router.delete('/interview/favorite', (req, res, next) => {
   const interviewId = req.interview._id;
 
-  Interview.findById(req.payload.id).then(function (interview) {
+  Interview.findById(req.body.id).then(function (interview) {
     if (!interview) { return res.sendStatus(401); }
 
     return Interview.unfavorite(interviewId).then(function () {
@@ -90,11 +88,11 @@ router.delete('/interview/favorite', (req, res) => {
   }).catch(next);
 });
 
-router.post('/interview/comments', (req, res) => {
-  Interview.findById(req.payload.interviewId).then(function (interview) {
+router.post('/interview/comments', (req, res, next) => {
+  Interview.findById(req.body.interviewId).then(function (interview) {
     if (!interview) { return res.sendStatus(401); }
 
-    User.findById(req.payload.userId).then(function (user) {
+    User.findById(req.body.userId).then(function (user) {
       if (!user) { return res.sendStatus(401); }
 
 
@@ -113,15 +111,15 @@ router.post('/interview/comments', (req, res) => {
   }).catch(next);
 });
 
-router.get('/interview/comments', (req, res) => {
-  Interview.findBySlug(req.payload.slug).then((interview) => {   //depeding on whether we are finding the interview by MongoDBs ID, or the slug that we create (use slug or ID)
+router.get('/interview/comments', (req, res, next) => {
+  Interview.findBySlug(req.body.slug).then((interview) => {   //depeding on whether we are finding the interview by MongoDBs ID, or the slug that we create (use slug or ID)
     if (!interview) { return res.sendStatus(401); }
     return res.json({ comments: interview.comments.toJSONFor(interview) });
   });
 });
 
 router.delete('/interview/comments/comment', (req, res) => {
-  if (req.comment.author.toString() === req.payload.id.toString()) {
+  if (req.comment.author.toString() === req.body.id.toString()) {
     req.interview.comments.remove(req.comment._id);
     req.interview.save().then(Comment.find({ _id: req.comment._id }).remove().exec())
       .then(function () {

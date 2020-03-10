@@ -36,7 +36,6 @@ InterviewSchema.pre('validate', function (next) {
   if (!this.slug) {
     this.slugify();
   }
-
   next();
 });
 
