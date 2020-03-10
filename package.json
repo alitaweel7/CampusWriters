@@ -39,5 +39,9 @@
     "update-mongo": "0.0.4",
     "axios": "^0.18.0",
     "if-env": "^1.0.4"
-  }
+  },
+  "devDependencies": {
+    "concurrently": "^4.1.0",
+    "nodemon": "^1.18.7"
+  },
 }
