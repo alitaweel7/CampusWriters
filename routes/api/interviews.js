@@ -31,6 +31,7 @@ router.get('/interview', (req, res) => {
 
 
 router.put('/interview', (req, res) => {
+  //console.log(req.body);
   Interview.findById(req.body.id).then(function (interview) {
     if (!interview) { return res.sendStatus(401); }
 

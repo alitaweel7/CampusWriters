@@ -4,13 +4,14 @@
   "description": "conduit on node",
   "main": "server.js",
   "scripts": {
-    "start": "node ./server.js",
+    "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
+    "start:prod": "node ./server.js",
+    "start:dev": "concurrently \"nodemon --ignore 'client/*'\" \"npm run client\"",
+    "install": "cd client && npm install",
+    "build": "cd client && npm run build",
+    "heroku-postbuild": "npm run build",
     "dev": "concurrently \"nodemon server.js\" \"cd client && npm start\"",
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/gothinkster/productionready-node-api.git"
   },
   "license": "ISC",
   "dependencies": {
@@ -35,6 +36,8 @@
     "request": "2.88.0",
     "slug": "1.0.0",
     "underscore": "1.9.1",
-    "update-mongo": "0.0.4"
+    "update-mongo": "0.0.4",
+    "axios": "^0.18.0",
+    "if-env": "^1.0.4"
   }
 }
