@@ -1,39 +1,46 @@
-const mongoose = require('mongoose');
+// Copy and paste your work, or start typing.const mongoose = require('mongoose');
 const router = require('express').Router();
 const Interview = require("../../models/Interview");
+const User = require('../../models/User');
 
 //All Routes from here begin with /api/interviews/ON_THIS_PAGE
 
-//this function takes object with
-// {
-//   authorId: 12,
-//   slug: "the first interview."
-// }
-router.post('/new', (req, res) => {
-  User.findById(req.body.autherId).then(function (user) {
-    interview.author = user;
-    // interview.title = req.body.title; //optional
-    interview.slug = req.body.slug; //optional
 
-    Interview.create({ author: user, slug: req.body.slug, ...req.body }).then(function () {
-      console.log(interview);
-      return res.json({ interview: interview.toJSONFor(user) })
-    });
-  }).catch(err => res.json(err));
+router.post('/new', (req, res) => {
+
+  User.findById(req.body.authorId).then(function (user) {
+    console.log(user.username);
+
+    const interviews = {
+      author: user,
+      slug: req.body.slug
+    };
+
+    console.log(interviews);
+
+    Interview.create(interviews)
+      .then(returnedInterview => {
+        console.log("returned Interview: " + returnedInterview.slug);
+        res.json("Interview Added: " + returnedInterview.slug)
+      })
+      .catch(err => res.status(400).json("Error: " + err))
+
+  }).catch(err => res.status(400).json(err))
 });
 
+
 router.get('/interview', (req, res) => {
-  Interview.findBySlug(req.body.slug).then((interview) => {   //depeding on whether we are finding the interview by MongoDBs ID, or the slug that we create
-    if (!interview) { return res.sendStatus(401); }
-    return res.json({ interview: interview.toJSONFor(interview) });
-  });
+  Interview.findById(req.body.id)
+    .then(interview => {   //depeding on whether we are finding the interview by MongoDBs ID, or the slug that we create
+      res.json({ data: interview });
+    })
+    .catch(err => res.status(400).json("Error: " + err));
 });
 
 
 router.put('/interview', (req, res) => {
-  //console.log(req.body);
+  console.log(req.body);
   Interview.findById(req.body.id).then(function (interview) {
-    if (!interview) { return res.sendStatus(401); }
 
     if (typeof req.body.interview.title !== 'undefined') {
       interview.title = req.body.interview.title;
@@ -47,17 +54,21 @@ router.put('/interview', (req, res) => {
       interview.body = req.body.interview.body;
     }
 
-    return interview.save().then(function (interview) {
-      return res.json({ interview: interview.toJSONFor(user) });
-    }).catch(next);
+    Interview.update(interview)
+      .then(interview => res.json("Interview updated " + interview))
+      .catch(err => res.status(400).json("Error: " + err));
 
-  });
+  })
+    .catch(err => res.status(400).json("Error: " + err))
 });
 
 router.delete("/delete", (req, res) => {
-  Interview.findByIdAndDelete(res.body.id).then(response => {
-    res.json(response)
-  })
+  Interview.findByIdAndDelete(req.body.id)
+    .then(response => {
+      res.json(response)
+    })
+    .catch(err => res.status(400).json("Error: " + err));
+
 });
 
 
@@ -113,7 +124,7 @@ router.post('/interview/comments', (req, res, next) => {
 });
 
 router.get('/interview/comments', (req, res, next) => {
-  Interview.findBySlug(req.body.slug).then((interview) => {   //depeding on whether we are finding the interview by MongoDBs ID, or the slug that we create (use slug or ID)
+  Interview.findById(req.body.id).then((interview) => {   //depeding on whether we are finding the interview by MongoDBs ID, or the slug that we create (use slug or ID)
     if (!interview) { return res.sendStatus(401); }
     return res.json({ comments: interview.comments.toJSONFor(interview) });
   });
