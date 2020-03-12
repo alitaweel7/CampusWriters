@@ -7,5 +7,9 @@ export default {
     },
     getOne: (query) => {
         return axios.post("/url", { query: query })
+    },
+    attemptLogin: (payload) => {
+        console.log(payload);
+        return axios.post("/api/users/login", payload);
     }
 }

@@ -3,6 +3,7 @@ mongoose.plugin(schema => { schema.options.usePushEach = true });
 const uniqueValidator = require('mongoose-unique-validator');
 const jwt = require('jsonwebtoken'); //not doing auth anymore
 const secret = require('../config').secret; ///// don't need this right?
+const crypto = require('crypto');
 
 const UserSchema = new mongoose.Schema({
   username: { type: String, lowercase: true, unique: true, required: [true, "can't be blank"], match: [/^[a-zA-Z0-9]+$/, 'is invalid'], index: true },
@@ -19,9 +20,24 @@ const UserSchema = new mongoose.Schema({
 UserSchema.plugin(uniqueValidator, { message: 'is already taken.' });
 
 UserSchema.methods.setPassword = function (password) {
-  this.salt = crypto.randomBytes(16).toString('hex');
-  this.hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hash = crypto.pbkdf2Sync(password, salt, 10000, 512, 'sha512').toString('hex');
+  return {
+    salt: salt,
+    hash: hash
+  };
 };
+
+UserSchema.methods.checkPassword = function (passwordToCheck, salt, hash) {
+  const hash2 = crypto.pbkdf2Sync(passwordToCheck, salt, 10000, 512, 'sha512').toString('hex');
+  if (hash == hash2) {
+    return true;
+  }
+  else {
+    console.log("sending false");
+    return false;
+  }
+}
 
 UserSchema.methods.favorite = function (id) {
   if (this.favorites.indexOf(id) === -1) {
@@ -70,15 +86,15 @@ UserSchema.methods.toAuthJSON = function () {
   };
 };
 
-UserSchema.methods.toProfileJSONFor = function (user) {
-  return {
-    username: this.username,
-    bio: this.bio,
-    image: this.image || 'https://static.productionready.io/images/smiley-cyrus.jpg',
-    school: this.school,
-    following: user ? user.isFollowing(this._id) : false
-  };
-};
+// UserSchema.methods.toProfileJSONFor = function (user) {
+//   return {
+//     username: this.username,
+//     bio: this.bio,
+//     image: this.image || 'https://static.productionready.io/images/smiley-cyrus.jpg',
+//     school: this.school,
+//     following: user ? user.isFollowing(this._id) : false
+//   };
+// };
 
 UserSchema.methods.follow = function (id) {
   if (this.following.indexOf(id) === -1) {

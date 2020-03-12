@@ -17,8 +17,8 @@ const InterviewSchema = new mongoose.Schema({
 
 InterviewSchema.plugin(uniqueValidator, { message: 'is already taken' });
 
-InterviewSchema.methods.slugify = function () {
-  this.slug = slug(this.title) + '-' + (Math.random() * Math.pow(36, 6) | 0).toString(36);
+InterviewSchema.methods.slugify = function (title) {
+  return slug(title) + '-' + (Math.random() * Math.pow(36, 6) | 0).toString(36);
 };
 
 InterviewSchema.methods.updateFavoriteCount = function () {
@@ -55,4 +55,5 @@ InterviewSchema.methods.toJSONFor = function (user) {
   };
 };
 
-mongoose.model('Interview', InterviewSchema)
+const Interview = mongoose.model('Interview', InterviewSchema)
+module.exports = Interview;

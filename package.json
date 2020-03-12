@@ -15,6 +15,8 @@
   },
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.18.0",
+    "babel": "^6.23.0",
     "body-parser": "1.18.3",
     "concurrently": "^5.1.0",
     "cors": "2.8.5",
@@ -25,6 +27,7 @@
     "express-jwt": "5.3.1",
     "express-package": "0.0.8",
     "express-session": "1.15.6",
+    "if-env": "^1.0.4",
     "jsonwebtoken": "8.5.0",
     "method-override": "3.0.0",
     "methods": "1.1.2",
@@ -36,9 +39,7 @@
     "request": "2.88.0",
     "slug": "1.0.0",
     "underscore": "1.9.1",
-    "update-mongo": "0.0.4",
-    "axios": "^0.18.0",
-    "if-env": "^1.0.4"
+    "update-mongo": "0.0.4"
   },
   "devDependencies": {
     "concurrently": "^4.1.0",
