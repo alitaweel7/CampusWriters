@@ -1,4 +1,4 @@
-// Copy and paste your work, or start typing.const mongoose = require('mongoose');
+const mongoose = require('mongoose');
 const router = require('express').Router();
 const Interview = require("../../models/Interview");
 const User = require('../../models/User');
@@ -30,6 +30,7 @@ router.post('/new', (req, res) => {
 
 
 router.get('/interview', (req, res) => {
+
   Interview.findById(req.body.id)
     .then(interview => {   //depeding on whether we are finding the interview by MongoDBs ID, or the slug that we create
       res.json({ data: interview });
@@ -39,7 +40,6 @@ router.get('/interview', (req, res) => {
 
 
 router.put('/interview', (req, res) => {
-  console.log(req.body);
   Interview.findById(req.body.id).then(function (interview) {
 
     if (typeof req.body.interview.title !== 'undefined') {
