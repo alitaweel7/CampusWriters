@@ -4,7 +4,8 @@ import API from "../utils/API"
 export class Registration extends Component {
     constructor(props) {
         super(props)
-            this.state = {
+        this.state = {
+            // bio: [],
         }
     }
 
@@ -12,7 +13,7 @@ export class Registration extends Component {
 
     }
 
-    render(){
+    render() {
         return <p>registration</p>
     }
 }
