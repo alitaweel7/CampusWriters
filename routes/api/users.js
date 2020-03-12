@@ -4,26 +4,46 @@ const User = require("../../models/User");
 
 // All routes from here begin with /api/users/*name
 router.post('/new', (req, res) => {
+  console.log(req.body);
+  const passwordObject = User.schema.methods.setPassword(req.body.password);
 
+  console.log(passwordObject);
   const user = {
     username: req.body.username,
-    email: req.body.email
-  }
-  User.create(user).then((dbUser) => {
-    return res.json({ dbUser });
-  }).catch(err => {
-    res.json(err)
-  })
+    email: req.body.email,
+    hash: passwordObject.hash,
+    salt: passwordObject.salt,
+  };
+
+  User.create(user)
+    .then(dbUser => res.json("User Added: " + user.username))
+    .catch(err => res.status(400).json("Error: " + err))
+
 });
 
 router.post('/login', (req, res) => {
-  res.json({ success: true })
+  console.log(req.body);
+  User.find()
+    .then(users => {
+      let returnedUser = null;
+      users.forEach(user => {
+        if (user.username == req.body.username) {
+          console.log("matched usernames");
+          if (User.schema.methods.checkPassword(req.body.password, user.salt, user.hash)) {
+            console.log("passwordsmatched");
+            returnedUser = user;
+          }
+        }
+      })
+      returnedUser == null ? res.status(400).json({ data: returnedUser }) : res.json({ data: returnedUser });
+    })
+    .catch(err => res.status(400).json('Error: ' + err));
 });
 
 router.route("/all").get((req, res) => {
-  User.find().then(users => {
-    res.json({ data: users })
-  })
+  User.find()
+    .then(users => res.json({ data: users }))
+    .catch(err => res.status(400).json('Error: ' + err));
 })
 
 
@@ -36,13 +56,15 @@ router.get('/user', (req, res) => {
 });
 
 router.delete("/delete", (req, res) => {
-  User.findByIdAndDelete(res.body.id).then(response => { // deleting the user, can't find byID
+  User.findByIdAndDelete(req.body.id).then(response => { // deleting the user, can't find byID
     res.json(response)
   })
 });
 
 router.put('/user', (req, res) => {
   User.findById(req.body.id).then(function (user) {
+
+    console.log(req.body);
     if (!user) { return res.sendStatus(401); }
 
     // only update fields that were actually passed...
@@ -61,13 +83,50 @@ router.put('/user', (req, res) => {
     if (typeof req.body.user.password !== 'undefined') {
       user.setPassword(req.body.user.password);
     }
-    return user.save().then(function () {
-      return res.json({ user: user.toAuthJSON() });
-    });
+    User.updateOne(user)
+      .then(user => res.json("User Updated: " + user.toAuthJSON()))
+      .catch(err => res.status(400).json("Error: " + err));
+
   }).catch(err => {
     res.json(err)
     console.log(err)
   });
 });
 
+router.post('/follow', (req, res) => {
+  console.log(req);
+  User.findById(req.body.currentId).then(currentUser => {
+
+    User.findById(req.body.followedId).then(followedUser => {
+
+      currentUser.following.push(followedUser);
+
+      User.update(currentUser)
+        .then(response => res.json("Follower added: " + followedUser))
+        .catch(err => res.status(400).json("Error: " + err));
+    })
+      .catch(err => res.status(400).json("Error finding followed user: " + err));
+  })
+    .catch(err => res.status(400).json("Error finding current user: " + err));
+});
+
+router.post('/unfollow', (req, res) => {
+  console.log(req);
+  User.findById(req.body.currentId).then(currentUser => {
+
+    User.findById(req.body.unfollowedId).then(unfollowedUser => {
+
+      const unfollowedUserIndex = currentUser.following.indexOf(unfollowedUser);
+      currentUser.following.splice(unfollowedUserIndex, 1)
+
+      User.update(currentUser)
+        .then(response => res.json("Follower removed: " + unfollowedUser))
+        .catch(err => res.status(400).json("Error: " + err));
+    })
+      .catch(err => res.status(400).json("Error finding unfollowed user: " + err));
+  })
+    .catch(err => res.status(400).json("Error finding current user: " + err));
+});
+
 module.exports = router;
+
