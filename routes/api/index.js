@@ -7,6 +7,9 @@ const path = require("path")
 router.use('/users', users);
 router.use('/interviews', interviews);
 
+router.use((req, res) => {
+    res.sendFile(path.join(__dirname + "../../client/build/static/index.html"))
+})
 
 
 module.exports = router;
