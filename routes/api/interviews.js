@@ -5,27 +5,58 @@ const User = require('../../models/User');
 
 //All Routes from here begin with /api/interviews/ON_THIS_PAGE
 
+//this function takes object with
+// {
+//   authorId: 12,
+//   slug: "the first interview."
+// }
 
 router.post('/new', (req, res) => {
-
   User.findById(req.body.authorId).then(function (user) {
-    console.log(user.username);
 
-    const interviews = {
+    const interview = {
+      slug: req.body.title + '-' + (Math.random() * Math.pow(36, 6) | 0).toString(36),
       author: user,
-      slug: req.body.slug
+      title: req.body.title,
+      description: req.body.description,
+      body: req.body.body,
+      tagList: req.body.tagList
     };
 
-    console.log(interviews);
+    console.log(interview);
 
-    Interview.create(interviews)
+    Interview.create(interview)
       .then(returnedInterview => {
-        console.log("returned Interview: " + returnedInterview.slug);
-        res.json("Interview Added: " + returnedInterview.slug)
+        console.log(returnedInterview);
+        // console.log("returned Interview: " + returnedInterview.title);
+        res.json("Interview Added: " + returnedInterview.title)
       })
       .catch(err => res.status(400).json("Error: " + err))
 
-  }).catch(err => res.status(400).json(err))
+  }).catch(err => res.status(400).json("Error: " + err))
+
+});
+
+
+router.post('/getAll', (req, res) => {
+  var interviewListToReturn = [];
+  User.findById(req.body.userId)
+    .then(user => {
+      Interview.find().then(interviewList => {
+        interviewList.forEach(interview => {
+          console.log(interview.author._id, user._id);
+          if (interview.author._id.toString() === user._id.toString()) {
+            console.log('adding to list');
+            interviewListToReturn.push(interview);
+          }
+        });
+        console.log(interviewListToReturn)
+        res.json({ data: interviewListToReturn });
+
+      })
+        .catch(err => res.status(400).json("Error: " + err));
+    })
+    .catch(err => res.status(400).json("Error: " + err));
 });
 
 

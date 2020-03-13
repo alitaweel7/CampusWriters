@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import API from "../utils/API";
 import { Home } from "./Home";
 import { Login } from "./Login";
 import { Registration } from "./Registration";
@@ -7,8 +6,10 @@ import {
     BrowserRouter as Router,
     Switch,
     Route,
-    Link
+    Link,
+    Redirect
   } from "react-router-dom";
+import { AddInterview } from "./AddInterview";
 
 
 export class Base extends Component {
@@ -25,6 +26,9 @@ export class Base extends Component {
     }
 
     componentDidMount() {
+        if(this.state.currentUser == null){
+            return <Redirect to="/login" />
+        }
     }
 
     render() {
@@ -35,14 +39,14 @@ export class Base extends Component {
                     <Link to="/" className="navbar-brand">CampusWriters</Link>
                     <div className="collpase navbar-collapse">
                         <ul className="navbar-nav mr-auto">
-                        {/* <li className="navbar-item">
-                            <Link to="/" className="nav-link">Home</Link>
-                        </li> */}
                             <li className="navbar-item">
-                                <Link to="/login" className="nav-link">Log In</Link>
+                                <Link to="/addInterview" className="nav-link">Create Interview</Link>
                             </li>
                             <li className="navbar-item">
                                 <Link to="/registration" className="nav-link">Registration</Link>
+                            </li>
+                            <li className="navbar-item">
+                                <Link to="/login" className="nav-link">Log In</Link>
                             </li>
                         </ul>
                     </div>
@@ -50,14 +54,21 @@ export class Base extends Component {
                     {/* A <Switch> looks through its children <Route>s and
                         renders the first one that matches the current URL. */}
                     <Switch>
-                    <Route path="/login">
-                        <Login loginCallback={this.userCallbackFromLogin} />
+                    <Route 
+                        path="/login" 
+                        render={(props) => <Login {...props} loginCallback={this.userCallbackFromLogin} />}>
                     </Route>
-                    <Route path="/">
-                        <Home currentUser={this.state.currentUser}/>
+                    <Route 
+                        path="/registration" 
+                        render={(props) => <Registration {...props} />}>
                     </Route>
-                    <Route path="/registation">
-                        <Registration/>
+                    <Route 
+                        path="/addInterview" 
+                        render={(props) => <AddInterview {...props} currentUser={this.state.currentUser} />}>
+                    </Route>
+                    <Route 
+                        path="/" 
+                        render={(props) => <Home {...props} currentUser={this.state.currentUser} />}>       
                     </Route>
                     </Switch>
                 </div>

@@ -1,39 +1,70 @@
 import React, { Component } from "react";
-import API from "../utils/API"
+import API from "../utils/API";
 
 export class Home extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            users: [],
+            interviews: [],
             currentUser: this.props.currentUser
         }
     }
 
     componentDidMount() {
-        API.getAll().then(res => {
-            console.log(res.data.data)
-            this.setState({ users: res.data.data })
-        })
+        console.log(this.props);
+        console.log(this.state.currentUser);
+        if(this.state.currentUser == null){
+            this.props.history.push('login');
+        }
+        else{
+            API.getInterviewByUser({userId: this.state.currentUser._id}).then(res => {
+                console.log(res.data.data)
+                this.setState({ interviews: res.data.data })
+            }).catch(err => {
+                console.log(err.response?.data);
+            });
+        }
     }
 
     render() {
         return (
             <div>
                 <div>
-                    <h1>Home</h1>
-                    {this.state.users ? this.state.users.map(user =>
-                        <p key={user._id}>{user.username}</p>
-                    ) : <h1>No users found</h1>}
-                </div>
-                <div>
-                    <h3>Current User</h3>
-                    <p>{this.state?.currentUser?.username}</p>
-                    <p>{this.state?.currentUser?.email}</p>
+                    <div>
+                        <h3>Hello {this.state.currentUser?.username}</h3>
+                        <h6>{this.state?.currentUser?.email}</h6>
+                        <br/>
+
+
+                        <h3>My Interviews: </h3>
+                        {this.state.interviews ? this.state.interviews.map(interview =>
+                            <div key={interview._id}>
+                                <div className="row">
+                                    <div className="xs-6">
+                                        <div className="card">
+                                            <div className="card-header">
+                                                <h2>{interview.title}</h2>
+                                                <h6>By {this.state.currentUser.username}</h6>
+                                            </div>
+                                            <div className="card-body">
+                                                <p>{interview.body}</p>
+                                            </div>
+                                            <div className="card-footer">
+                                                <ul>
+                                                    {interview.tagList.map(tag => 
+                                                        <li>{tag}</li>
+                                                    )}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <br/>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : <h1>No interviews found</h1>}
+                    </div>
                 </div>
             </div>
         )
     }
 }
-
-

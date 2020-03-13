@@ -13,13 +13,15 @@ router.post('/new', (req, res) => {
     email: req.body.email,
     hash: passwordObject.hash,
     salt: passwordObject.salt,
+    bio: req.body.bio,
+    school: req.body.school
   };
 
   User.create(user)
     .then(dbUser => res.json("User Added: " + user.username))
     .catch(err => res.status(400).json("Error: " + err))
-
 });
+
 
 router.post('/login', (req, res) => {
   console.log(req.body);
@@ -39,6 +41,7 @@ router.post('/login', (req, res) => {
     })
     .catch(err => res.status(400).json('Error: ' + err));
 });
+
 
 router.route("/all").get((req, res) => {
   User.find()
@@ -129,4 +132,5 @@ router.post('/unfollow', (req, res) => {
 });
 
 module.exports = router;
+
 
