@@ -10,7 +10,7 @@ console.log(process.env.MONGODB_URI)
 // Create global app object
 const app = express();
 app.use(cors());
-
+app.use(express.static("client/build"))
 // Normal express config defaults
 app.use(require('morgan')('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
