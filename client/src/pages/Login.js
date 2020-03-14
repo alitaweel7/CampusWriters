@@ -15,17 +15,17 @@ export class Login extends Component {
         }
     }
 
-    handleClick(event){
+    handleClick(event) {
         console.log(this.state);
         var payload = {
-            "username" : this.state.username,
-            "password" : this.state.password
+            "username": this.state.username,
+            "password": this.state.password
         }
         console.log(payload);
         API.attemptLogin(payload).then(res => {
-            this.setState({currentUser: res.data.data});
+            this.setState({ currentUser: res.data.data });
             this.props.loginCallback(this.state.currentUser);
-            setTimeout( () => {
+            setTimeout(() => {
                 this.props.history.push('/');
             }, 1000);
         }).catch(err => {
@@ -40,27 +40,27 @@ export class Login extends Component {
                     <h1>Login</h1>
                     <div className="form-group">
                         <label>Username: </label>
-                        <br/>
+                        <br />
                         <input
                             type="text"
                             placeholder="enter your username"
-                            onChange = { (event) => { this.setState({username: event.target.value})} }
-                            />
-                    </div>
-                    <br/>
-                    <div className="form-group">
-                        <label>Password: </label>
-                        <br/>
-                        <input
-                            type="text"
-                            placeholder="enter your password"
-                            onChange = { (event) => { this.setState({password: event.target.value})} }
+                            onChange={(event) => { this.setState({ username: event.target.value }) }}
                         />
                     </div>
-                    <br/>
+                    <br />
+                    <div className="form-group">
+                        <label>Password: </label>
+                        <br />
+                        <input
+                            type="password"
+                            placeholder="enter your password"
+                            onChange={(event) => { this.setState({ password: event.target.value }) }}
+                        />
+                    </div>
+                    <br />
                     <button onClick={(event) => this.handleClick(event)}> Login </button>
                 </div>
-          </div>
+            </div>
         )
     }
 }
