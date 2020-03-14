@@ -6,7 +6,7 @@ const cors = require('cors')
 const mongoose = require('mongoose');
 const router = require('./routes')
 const isProduction = process.env.NODE_ENV === 'production';
-
+console.log(process.env.MONGODB_URI)
 // Create global app object
 const app = express();
 app.use(cors());
@@ -20,7 +20,8 @@ app.use(require('method-override')());
 app.use(express.static(__dirname + '/public'));
 
 if (isProduction) {
-  mongoose.connect(process.env.MONGODB_URI);
+  mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
+
 } else {
   mongoose.connect('mongodb://localhost/conduit');// I removed conduit ask Justin!!!!!!!!!!!
   mongoose.set('debug', true);
