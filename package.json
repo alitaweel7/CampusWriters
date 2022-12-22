@@ -27,7 +27,7 @@
     "express-package": "0.0.8",
     "express-session": "1.15.6",
     "if-env": "^1.0.4",
-    "jsonwebtoken": "8.5.0",
+    "jsonwebtoken": "9.0.0",
     "method-override": "3.0.0",
     "methods": "1.1.2",
     "mongoose": "5.4.15",
